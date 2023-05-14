@@ -1,4 +1,3 @@
-import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,7 +6,6 @@ import java.io.*;
 
 import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.contains;
 
 public class MainTest {
 
@@ -92,7 +90,7 @@ public class MainTest {
     }
 
     private void writeToInputFile(String fileContent) throws IOException {
-        File file = new File("operations.txt");
+        File file = new File("src/main/operations.txt");
         FileWriter fileWriter = new FileWriter(file);
         fileWriter.write(fileContent);
         fileWriter.close();
@@ -102,7 +100,6 @@ public class MainTest {
     void init() {
         System.setOut(new PrintStream(outContent));
     }
-
 
     @AfterEach
     void cleanup() {

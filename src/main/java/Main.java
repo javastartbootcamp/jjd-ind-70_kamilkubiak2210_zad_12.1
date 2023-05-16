@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Main {
@@ -8,15 +7,21 @@ public class Main {
     static final String outputFile = "src/main/results.txt";
 
     public static void main(String[] args) {
+
+        OperationsReader operationsReader = new OperationsReader();
         List<String> operations;
         try {
-            operations = readDataOperations();
-            List<Double> results = calculateResultsAndReturnList(operations);
-            List<String> operationsAndResults = makeOperationsAndResultsInOneList(operations, results);
-            printOperationsWithResults(operationsAndResults);
+            operations = operationsReader.readDataOperations(inputFile);
+        } catch (IOException e) {
+            throw new NullPointerException("Nie udało się wczytać pliku");
+        }
+        List<Double> results = calculateResultsAndReturnList(operations);
+        List<String> operationsAndResults = makeOperationsAndResultsInOneList(operations, results);
+        printOperationsWithResults(operationsAndResults);
+        try {
             saveOperationsWithResults(operationsAndResults);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("Nie udało się zapisać pliku");
         }
     }
 
@@ -24,26 +29,6 @@ public class Main {
         for (String line : list) {
             System.out.println(line);
         }
-    }
-
-    private static List<String> readDataOperations() throws IOException {
-        List<String> list = new LinkedList<>();
-
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(inputFile))) {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                String[] word = line.split("\\s+");
-                String word0 = word[0];
-                String word1 = word[1];
-                String word2 = word[2];
-
-                double v = Double.parseDouble(word0);
-                double v1 = Double.parseDouble(word2);
-                String resultString = v + " " + word1 + " " + v1;
-                list.add(resultString);
-            }
-        }
-        return list;
     }
 
     private static List<Double> calculateResultsAndReturnList(List<String> list) {

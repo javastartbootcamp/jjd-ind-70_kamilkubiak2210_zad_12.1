@@ -7,21 +7,26 @@ public class Main {
     static final String outputFile = "src/main/results.txt";
 
     public static void main(String[] args) {
+        List<Operation> operationList = null;
+        try {
+            OperationReader operationReader = new OperationReader();
+            operationList = operationReader.readOperation(inputFile);
 
-        OperationsReader operationsReader = new OperationsReader();
-        List<String> operations;
-        try {
-            operations = operationsReader.readDataOperations(inputFile);
         } catch (IOException e) {
-            throw new NullPointerException("Nie udało się wczytać pliku");
+            System.err.println("Nie można odczytać pliku " + inputFile);
         }
-        List<Double> results = calculateResultsAndReturnList(operations);
-        List<String> operationsAndResults = makeOperationsAndResultsInOneList(operations, results);
-        printOperationsWithResults(operationsAndResults);
-        try {
-            saveOperationsWithResults(operationsAndResults);
-        } catch (IOException e) {
-            System.err.println("Nie udało się zapisać pliku");
+
+        if (operationList != null && operationList.size() != 0) {
+            List<Double> results = calculateResults(operationList);
+            List<String> operationsAndResults = makeOperationsAndResultsInOneList(operationList, results);
+            printOperationsWithResults(operationsAndResults);
+            try {
+                saveOperationsWithResults(operationsAndResults);
+            } catch (IOException e) {
+                System.err.println("Nie udało się zapisać pliku" + outputFile);
+            }
+        } else {
+            System.err.println("Pusta lista operacji");
         }
     }
 
@@ -31,27 +36,25 @@ public class Main {
         }
     }
 
-    private static List<Double> calculateResultsAndReturnList(List<String> list) {
+    private static List<Double> calculateResults(List<Operation> list) {
         List<Double> newList = new ArrayList<>();
-
-        for (String line : list) {
-            String[] strings = line.split("\\s+");
-            double result = switch (strings[1]) {
-                case "+" -> Double.parseDouble(strings[0]) + Double.parseDouble(strings[2]);
-                case "-" -> Double.parseDouble(strings[0]) - Double.parseDouble(strings[2]);
-                case "*" -> Double.parseDouble(strings[0]) * Double.parseDouble(strings[2]);
-                case "/" -> Double.parseDouble(strings[0]) / Double.parseDouble(strings[2]);
-                default -> throw new IllegalStateException("Nieznana wartość " + strings[1]);
+        for (Operation operation : list) {
+            double result = switch (operation.getOperation()) {
+                case "+" -> operation.getX() + operation.getY();
+                case "-" -> operation.getX() - operation.getY();
+                case "*" -> operation.getX() * operation.getY();
+                case "/" -> operation.getX() / operation.getY();
+                default -> throw new IllegalStateException("Nieznana wartość " + operation.getOperation());
             };
             newList.add(result);
         }
         return newList;
     }
 
-    private static List<String> makeOperationsAndResultsInOneList(List<String> strings, List<Double> doubles) {
+    private static List<String> makeOperationsAndResultsInOneList(List<Operation> operations, List<Double> results) {
         List<String> newList = new ArrayList<>();
-        for (int i = 0; i < doubles.size(); i++) {
-            String line = (strings.get(i) + " = " + doubles.get(i));
+        for (int i = 0; i < results.size(); i++) {
+            String line = (operations.get(i) + " = " + results.get(i));
             newList.add(line);
         }
         return newList;
@@ -66,5 +69,3 @@ public class Main {
         }
     }
 }
-
-
